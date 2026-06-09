@@ -1,8 +1,16 @@
 # Zmiany backend #
 LOGIN / REGISTER → dodanie id_user
+```
+res.json({
+  token,
+  id_user: user.getDataValue("id_user"),
+});
+```
+
 Wcześniej frontend miał tylko token i nie wiedział kto jest zalogowany, co powodowało błędy 403 i złe uprawnienia.
 
 Middleware — GET req.body fix
+
 Backend czyta dane z req.body nawet dla GET, ale axios nie wysyła body przy GET requestach. Middleware przepisuje req.query → req.body jako obejście:
 
 ```js
