@@ -43,35 +43,40 @@ export default function Profile() {
     const [avatar, setAvatar] = useState<string | null>(null);
     const [displayName, setDisplayName] = useState<string>("");
 
+    const [cover, setCover] = useState<string | null>(
+        localStorage.getItem(`cover_${userId}`)
+    );
+
+
     const loadUser = async () => {
-    if (!userId || isNaN(userId)) return;
+        if (!userId || isNaN(userId)) return;
 
-    try {
-        const u = await getUserProfile(userId);
+        try {
+            const u = await getUserProfile(userId);
 
-        console.log("PROFILE:", u);
+            console.log("PROFILE:", u);
 
-        setUser(u || {});
+            setUser(u || {});
 
-        const localName = localStorage.getItem(`name_${userId}`);
-        const localSurname = localStorage.getItem(`surname_${userId}`);
+            const localName = localStorage.getItem(`name_${userId}`);
+            const localSurname = localStorage.getItem(`surname_${userId}`);
 
-        setDisplayName(
-            localName || localSurname
-                ? `${localName || ""} ${localSurname || ""}`.trim()
-                : u?.name || u?.surname
-                ? `${u.name || ""} ${u.surname || ""}`.trim()
-                : `User ${userId}`
-        );
+            setDisplayName(
+                localName || localSurname
+                    ? `${localName || ""} ${localSurname || ""}`.trim()
+                    : u?.name || u?.surname
+                        ? `${u.name || ""} ${u.surname || ""}`.trim()
+                        : `User ${userId}`
+            );
 
-    } catch (err) {
-        console.error("USER ERROR:", err);
+        } catch (err) {
+            console.error("USER ERROR:", err);
 
-        setUser({});
+            setUser({});
 
-        setDisplayName(`User ${userId}`);
-    }
-};
+            setDisplayName(`User ${userId}`);
+        }
+    };
 
     const loadPosts = async () => {
         if (userId === null || isNaN(userId)) return;
@@ -99,15 +104,20 @@ export default function Profile() {
     useEffect(() => {
         if (!userId || isNaN(userId)) return;
 
-        
-   const savedAvatar = localStorage.getItem(`avatar_${userId}`);
-    if (savedAvatar) {
-        setAvatar(savedAvatar);
-    }
+
+        const savedAvatar = localStorage.getItem(`avatar_${userId}`);
+        if (savedAvatar) {
+            setAvatar(savedAvatar);
+        }
 
 
         loadUser();
         loadPosts();
+    }, [userId]);
+
+    useEffect(() => {
+        const saved = localStorage.getItem(`cover_${userId}`);
+        setCover(saved);
     }, [userId]);
 
     const handleAvatarChange = (e: any) => {
@@ -122,6 +132,18 @@ export default function Profile() {
             localStorage.setItem(`avatar_${userId}`, base64);
         };
         reader.readAsDataURL(file);
+    };
+
+
+    const handleCover = (e: any) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const preview = URL.createObjectURL(file);
+
+        setCover(preview);
+
+        localStorage.setItem(`cover_${userId}`, preview);
     };
 
     if (!userId || isNaN(userId)) {
@@ -152,9 +174,35 @@ export default function Profile() {
             <Navbar />
 
             {/* COVER + AVATAR */}
-            <div className="bg-blue-500 h-44 relative">
+            <div className="relative mb-4">
+
+                {/* ✅ COVER */}
+                <div className="h-48 rounded overflow-hidden bg-blue-500">
+                    {cover && (
+                        <img
+                            src={cover}
+                            className="w-full h-full object-cover"
+                        />
+                    )}
+                </div>
+
+                {/* ✅ BUTTON */}
+                {String(userId) === localStorage.getItem("user_id") && (
+                    <label className="absolute bottom-2 right-2 bg-white px-3 py-1 rounded shadow cursor-pointer">
+                        Change cover
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleCover}
+                            hidden
+                        />
+                    </label>
+                )}
+
+                {/* ✅ AVATAR */}
                 <div className="absolute -bottom-14 left-8">
                     <label className="cursor-pointer group relative">
+
                         <div className="w-28 h-28 rounded-full border-4 border-white overflow-hidden bg-gray-300">
                             {avatar && (
                                 <img
@@ -177,6 +225,7 @@ export default function Profile() {
                         />
                     </label>
                 </div>
+
             </div>
 
             {/* HEADER */}
