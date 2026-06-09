@@ -1,3 +1,34 @@
+# instalacja #
+```
+npm install
+npm run dev
+```
+
+do taliwinda: 
+```
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+tailwind.config.js
+```
+content: [
+  "./index.html",
+  "./src/**/*.{js,ts,jsx,tsx}",
+],
+```
+
+ index.css
+ ```
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+main.tsx
+```
+import "./index.css";
+```
+
 # Zmiany backend #
 LOGIN / REGISTER → dodanie id_user
 ```
@@ -9,7 +40,7 @@ res.json({
 
 Wcześniej frontend miał tylko token i nie wiedział kto jest zalogowany, co powodowało błędy 403 i złe uprawnienia.
 
-
+<br>
 
 Middleware — GET req.body fix
 
